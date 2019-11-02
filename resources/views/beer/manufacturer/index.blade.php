@@ -10,6 +10,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h1>Производители</h1>
+                        @include('beer.manufacturer.filter')
                         <table class="table table-hover">
                             <thead>
                             <tr>

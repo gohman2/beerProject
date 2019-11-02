@@ -112,7 +112,12 @@ class TypeBeerController extends Controller
      */
     public function destroy($id)
     {
-        TypeBeer::find($id)->delete();
-        return redirect()->route('beer.types.index')->with('status', 'Тип пива удален!');
+        $getBeer = TypeBeer::find($id)->beer()->where('type_id', '=', $id)->first();
+        if($getBeer === null){
+            TypeBeer::destroy($id);
+            return redirect()->route('beer.types.index')->with('status', 'Тип пива удален!');
+        }else{
+            return redirect()->route('beer.types.index')->with('status', 'Невозможно удалить Тип пива так как он используется!');
+        }
     }
 }

@@ -10,6 +10,6 @@ class TypeBeer extends Model
 
     public function beer()
     {
-        return $this->hasMany(Beer::class);
+        return $this->hasMany(Beer::class, 'type_id');
     }
 }

@@ -15,6 +15,7 @@ class BeerController extends Controller
         'title.required' => 'Название обязательно к заполнению',
         'title.unique' => 'Название должно быть уникальным',
     ];
+
     /**
      * Display a listing of the resource.
      *
@@ -22,12 +23,29 @@ class BeerController extends Controller
      */
     public function index(Request $request)
     {
+
         $manufacturers = Manufacturer::pluck('title', 'id')->all();
-        $typeBeers     = TypeBeer::pluck('title', 'id')->all();
+        $typeBeers = TypeBeer::pluck('title', 'id')->all();
 
-        $beers = Beer::paginate(5);
+        $mId = false;
+        $tId = false;
 
-        return view('beer.index', compact('beers', 'manufacturers', 'typeBeers'));
+        if ($request->get('manufacturer_id') !== null && $request->get('type_id') !== null) {
+            $mId = (int)$request->get('manufacturer_id');
+            $tId = (int)$request->get('type_id');
+            $beers = Beer::where('manufacturer_id', '=', $mId)->where('type_id', '=', $tId)->paginate(5);
+        } else {
+            $beers = Beer::paginate(5);
+        }
+
+        return view('beer.index', compact(
+            'beers',
+            'manufacturers',
+            'typeBeers',
+            'mId',
+            'tId'
+
+        ));
     }
 
     /**
@@ -38,7 +56,7 @@ class BeerController extends Controller
     public function create()
     {
         $manufacturers = Manufacturer::pluck('title', 'id')->all();
-        $typeBeers     = TypeBeer::pluck('title', 'id')->all();
+        $typeBeers = TypeBeer::pluck('title', 'id')->all();
 
         return view('beer.create', compact(
             'manufacturers', 'typeBeers'
@@ -48,7 +66,7 @@ class BeerController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -74,7 +92,7 @@ class BeerController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -85,14 +103,14 @@ class BeerController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
         $beer = Beer::find($id);
         $manufacturers = Manufacturer::pluck('title', 'id')->all();
-        $typeBeers     = TypeBeer::pluck('title', 'id')->all();
+        $typeBeers = TypeBeer::pluck('title', 'id')->all();
         $selectedManufacturer = $beer->manufacturer_id;
         $selectedType = $beer->type_id;
 
@@ -108,8 +126,8 @@ class BeerController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -134,7 +152,7 @@ class BeerController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
